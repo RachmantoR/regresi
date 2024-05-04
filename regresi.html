@@ -2,124 +2,97 @@
 <html>
 <head>
 <title>Page Title</title>
+<style>
+table, th, td {
+  border:1px solid black;
+}
+table{
+  width: 100%;
+  text-align: center;
+}
+</style>
 </head>
 <body>
-x:
-<input id="x" type="text">
-y:
-<input id="y" type="text">
+
+<input type="number" id="x">
+<input type="number" id="y">
+<button onclick="prc()">Add</button>
 <br>
-<button onclick="run()">RUN CALCULATION</button>
+
+<table>
+    <thead>
+        <tr>
+            <th>X</th>
+            <th>Y</th>
+            <th>X2</th>
+            <th>Y2</th>
+            <th>XY</th>
+        </tr> 
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+<h1> - </h1>
 
 <script>
-	let reg = {
-  //this part 1 of the datatable
-  x: [],
-  y: [],
-  Sx: 0,
-  Sy: 0,
-  Xy: [],
-  X2: [],
-  Sxy: 0,
-  Sx2: 0,
-  
-  //this part 2 of the datatable
-  xInv: 0,
-  yInv: 0,
-  SSxx: 0,
-  SSxy: 0,
-  b: 0,
-  a: parseFloat(0),
-  
-  init: function(a, b){
-    this.x = a.split(',');
-    this.y = b.split(',');
-  },
-  sum: function(){
-    for(i = 0; i < this.x.length; i++){
-      this.Xy.push((parseFloat(this.x[i]) * parseFloat(this.y[i])).toFixed(3));
-      this.X2.push((Math.pow(parseFloat(this.x[i]), 2)).toFixed(3));
-    }
-    for(i = 0; i < this.x.length; i++){
-      this.Sx += parseFloat(this.x[i]);
-      this.Sy += parseFloat(this.y[i]);
-      this.Sxy += parseFloat(this.Xy[i]);
-      this.Sx2 += parseFloat(this.X2[i]);
-    }
-  },
-  inv: function(){
-    this.xInv = (parseFloat(this.Sx) / this.x.length).toFixed(3);
-    this.yInv = (parseFloat(this.Sy) / this.x.length).toFixed(3);
-  },
-  SS: function(){
-    this.SSxy = (parseFloat(this.Sxy) - (parseFloat(this.Sx) * parseFloat(this.Sy)) / this.x.length).toFixed(3);
-    this.SSxx = (parseFloat(this.Sx2) - Math.pow(parseFloat(this.Sx), 2) / this.x.length).toFixed(3);
-  },
-  ab: function(){
-    this.b = (parseFloat(this.SSxy) / parseFloat(this.SSxx)).toFixed(3);
-    this.a = (parseFloat(this.yInv) - parseFloat(this.b) * parseFloat(this.xInv)).toFixed(3);
-  },
-  render: function(){
-	document.write(`<tr>
-	<td>
-		x = ${this.x}
-	</td><br>
-    <td>
-		y = ${this.y}
-	</td><br>
-    <td>
-		xy = ${this.Xy}
-	</td><br>
-    <td>
-		x2 =${this.X2}
-	</td><br>
-    <td>
-		Sx = ${this.Sx}
-	</td><br>
-    <td>
-		Sy = ${this.Sy}
-	</td><br>
-    <td>
-		Sxy = ${this.Sxy}
-	</td><br>
-    <td>
-		Sx2 = ${this.Sx2}
-	</td><br>
-    <td>
-		yInv = ${this.yInv}
-	</td><br>
-    <td>
-		xInv = ${this.xInv}
-	</td><br>
-    <td>
-		SSxy = ${this.SSxy}
-	</td><br>
-    <td>
-		SSxx = ${this.SSxx}
-	</td><br>
-    <td>
-		b = ${this.b}
-	</td><br>
-    <td>
-		a = ${this.a}
-	</td><br>
-    <td>
-		yReg = <p>${this.a} + ${this.b} x</p>
-	</td><br>
-    </tr>`);
+
+let x = [];
+let y = [];
+let x2 = [];
+let y2 = [];
+let xy = [];
+
+function prc(){
+	x.push(document.getElementById("x").value);
+    y.push(document.getElementById("y").value);
+    for(let counter = 0; counter < x.length; counter++){
+		x2[counter] = x[counter] * x[counter];
+        y2[counter] = y[counter] * y[counter];
+        xy[counter] = x[counter] * y[counter];
 	}
+    tableFetcher(x, y, x2, y2, xy);
 }
 
-function run(){
-  let x = document.getElementById("x").value;
-  let y = document.getElementById("y").value;
-  reg.init(x,y);
-  reg.sum();
-  reg.inv();
-  reg.SS();
-  reg.ab();
-  reg.render();
-  document.write(`<a href=${'index.html'}>return</a>`);
+function tableFetcher(x, y, x2, y2, xy){
+    let table = document.querySelector("table tbody");
+    let sigma_x = 0;
+    let sigma_y = 0;
+    let sigma_x2 = 0;
+    let sigma_y2 = 0;
+    let sigma_xy = 0;
+    while(table.childNodes.length > 0){
+        table.removeChild(table.firstChild);
+    }
+    for(let counter = 0; counter < x.length; counter++){
+    sigma_x = sigma_x + parseInt(x[counter]);
+    sigma_y = sigma_y +parseInt(y[counter]);
+    sigma_x2 = sigma_x2 +parseInt(x2[counter]);
+    sigma_y2 = sigma_y2 +parseInt(y2[counter]);
+    sigma_xy = sigma_xy +parseInt(xy[counter]);
+    let newform = document.createElement("tr");
+    newform.innerHTML = `<td>${x[counter]}</td> <td>${y[counter]}</td> <td>${x2[counter]}</td> <td>${y2[counter]}</td> <td>${xy[counter]}</td>`;
+    table.appendChild(newform);
+    }
+    let newform = document.createElement("tr");
+    newform.innerHTML = `<td>sigma ${sigma_x}</td> <td>sigma ${sigma_y}</td> <td>sigma ${sigma_x2}</td> <td>sigma ${sigma_y2}</td> <td>sigma ${sigma_xy}</td>`;
+    table.appendChild(newform);
+    diff(sigma_x, sigma_y, sigma_x2, sigma_y2, sigma_xy, x.length);
+}
+
+function diff(sigma_x, sigma_y, sigma_x2, sigma_y2, sigma_xy, ind){
+    //
+    let SSxy = sigma_xy - (sigma_x * sigma_y) / ind;
+    //
+    let SSxx = sigma_x2 - (sigma_x ** 2) / ind;
+    //
+    let SSyy = sigma_y2 - (sigma_y ** 2) / ind;
+    //
+    let r = SSxy / Math.sqrt(SSxx * SSyy);
+    //
+    let indip = document.querySelector("h1");
+    indip.innerHTML = `SSxy = ${SSxy.toFixed(2)}, SSxx = ${SSxx.toFixed(2)}, SSyy = ${SSyy.toFixed(2)}, r = ${r.toFixed(2)}`;
 }
 </script>
 
